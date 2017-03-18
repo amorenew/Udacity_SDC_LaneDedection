@@ -1,3 +1,4 @@
+import cv2
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,6 +16,7 @@ xsize = image.shape[1]
 # Note: always make a copy rather than simply using "="
 color_select = np.copy(image)
 region_select = np.copy(image)
+# canny_edge_select = np.copy(image)
 
 # Define our color selection criteria
 # Note: if you run this code, you'll find these are not sensible values!!
@@ -57,11 +59,32 @@ region_thresholds = (YY > (XX * fit_left[0] + fit_left[1])) & \
 # combine color select and region of interest
 region_select[~color_thresholds & region_thresholds] = [255, 0, 0]
 
+# Read in the image and convert to grayscale
+gray_select = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+# Define a kernel size for Gaussian smoothing / blurring
+# Note: this step is optional as cv2.Canny() applies a 5x5 Gaussian internally
+kernel_size = 5  # Must be an odd number (3, 5, 7...)
+blur_gray = cv2.GaussianBlur(gray_select, (kernel_size, kernel_size), 0)
+
+# Define parameters for Canny and run it
+# NOTE: if you try running this code you might want to change these!
+low_threshold = 50
+high_threshold = 150
+edges_select = cv2.Canny(blur_gray, low_threshold, high_threshold)
+
+
+
 # Display the image
 plt.imshow(color_select)
 plt.show()
 plt.imshow(region_select)
 plt.show()
+plt.imshow(gray_select, cmap='gray')
+plt.show()
+plt.imshow(edges_select, cmap='Greys_r')
+plt.show()
 # to save the image locally
 mpimg.imsave("test-color-select.jpg", color_select)
 mpimg.imsave("test-region-color-select.jpg", region_select)
+mpimg.imsave("test-cv-gray.jpg", gray_select)
+mpimg.imsave("test-cv-edges.jpg", edges_select)
