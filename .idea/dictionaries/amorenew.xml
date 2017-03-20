@@ -2,6 +2,8 @@
   <dictionary name="amorenew">
     <words>
       <w>grayscale</w>
+      <w>hough</w>
+      <w>imshape</w>
     </words>
   </dictionary>
 </component>

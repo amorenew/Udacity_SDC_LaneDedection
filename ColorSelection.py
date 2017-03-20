@@ -72,19 +72,56 @@ low_threshold = 50
 high_threshold = 150
 edges_select = cv2.Canny(blur_gray, low_threshold, high_threshold)
 
+# Next we'll create a masked edges image using cv2.fillPoly()
+mask = np.zeros_like(edges_select)
+ignore_mask_color = 255
 
+# This time we are defining a four sided polygon to mask
+vertices = np.array([[(0, ysize), (xsize * .30, ysize * .63), (xsize * .60, ysize * .64), (xsize, ysize)]],
+                    dtype=np.int32)
+cv2.fillPoly(mask, vertices, ignore_mask_color)
+masked_edges = cv2.bitwise_and(edges_select, mask)
+
+# Define the Hough transform parameters
+# Make a blank the same size as our image to draw on
+rho = 1  # distance resolution in pixels of the Hough grid
+theta = np.pi / 180  # angular resolution in radians of the Hough grid
+threshold = 1  # minimum number of votes (intersections in Hough grid cell)
+min_line_length = 7  # minimum number of pixels making up a line
+max_line_gap = 3  # maximum gap in pixels between connectible line segments
+line_image = np.copy(image) * 0  # creating a blank to draw lines on
+
+# Run Hough on edge detected image
+lines = cv2.HoughLinesP(masked_edges, rho, theta, threshold, np.array([]), min_line_length, max_line_gap)
+
+# Iterate over the output "lines" and draw lines on the blank
+for line in lines:
+    for x1, y1, x2, y2 in line:
+        cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 10)
+
+# Create a "color" binary image to combine with line image
+color_edges = np.dstack((edges_select, edges_select, edges_select))
+
+# Draw the lines on the edge image
+combine_edges_lines = cv2.addWeighted(color_edges, 0.8, line_image, 1, 0)
 
 # Display the image
 plt.imshow(color_select)
-plt.show()
+# plt.show()
 plt.imshow(region_select)
-plt.show()
+# plt.show()
 plt.imshow(gray_select, cmap='gray')
-plt.show()
+# plt.show()
 plt.imshow(edges_select, cmap='Greys_r')
+# plt.show()
+plt.imshow(line_image)
+# plt.show()
+plt.imshow(combine_edges_lines)
 plt.show()
 # to save the image locally
 mpimg.imsave("test-color-select.jpg", color_select)
 mpimg.imsave("test-region-color-select.jpg", region_select)
 mpimg.imsave("test-cv-gray.jpg", gray_select)
 mpimg.imsave("test-cv-edges.jpg", edges_select)
+mpimg.imsave("test-cv-line-image.jpg", line_image)
+mpimg.imsave("test-cv-combine-edges-lines.jpg", combine_edges_lines)
