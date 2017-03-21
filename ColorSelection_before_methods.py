@@ -106,6 +106,8 @@ color_edges = np.dstack((edges_select, edges_select, edges_select))
 combine_edges_lines = cv2.addWeighted(color_edges, 0.8, line_image, 1, 0)
 
 # Display the image
+plt.imshow(masked_edges)
+plt.show()
 plt.imshow(color_select)
 # plt.show()
 plt.imshow(region_select)
@@ -118,6 +120,12 @@ plt.imshow(line_image)
 # plt.show()
 plt.imshow(combine_edges_lines)
 plt.show()
+
+
+def process_image():
+    return combine_edges_lines
+
+
 # to save the image locally
 mpimg.imsave("test-color-select.jpg", color_select)
 mpimg.imsave("test-region-color-select.jpg", region_select)
