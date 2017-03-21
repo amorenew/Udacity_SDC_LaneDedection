@@ -103,11 +103,11 @@ for line in lines:
 color_edges = np.dstack((edges_select, edges_select, edges_select))
 
 # Draw the lines on the edge image
-combine_edges_lines = cv2.addWeighted(color_edges, 0.8, line_image, 1, 0)
+combine_edges_lines = cv2.addWeighted(image, 0.8, line_image, 1, 0)
 
 # Display the image
-plt.imshow(masked_edges)
-plt.show()
+# plt.imshow(masked_edges)
+# plt.show()
 plt.imshow(color_select)
 # plt.show()
 plt.imshow(region_select)

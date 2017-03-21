@@ -73,7 +73,7 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
-def draw_lines(img, lines, color=[158, 154, 54], thickness=10):
+def draw_lines(img, lines, color=[255, 0, 0], thickness=10):
     """
     NOTE: this is the function you might want to use as a starting point once you want to
     average/extrapolate the line segments you detect to map out the full
@@ -90,10 +90,10 @@ def draw_lines(img, lines, color=[158, 154, 54], thickness=10):
     If you want to make the lines semi-transparent, think about combining
     this function with the weighted_img() function below
     """
-    line_image = np.copy(img) * 0  # creating a blank to draw lines on
+    # line_image = np.copy(img) * 0  # creating a blank to draw lines on
     for line in lines:
         for x1, y1, x2, y2 in line:
-            cv2.line(line_image, (x1, y1), (x2, y2), color, thickness)
+            cv2.line(img, (x1, y1), (x2, y2), color, thickness)
 
 
 def hough_lines(img):
@@ -113,9 +113,26 @@ def hough_lines(img):
 
     lines = cv2.HoughLinesP(masked_image, rho, theta, threshold, np.array([]), min_line_length,
                             max_line_gap)
-    line_img = np.zeros((masked_image.shape[0], masked_image.shape[1], 3), dtype=np.uint8)
+    line_img = np.copy(image) * 0  # creating a blank to draw lines on
     draw_lines(line_img, lines)
     return line_img
+
+
+# Python 3 has support for cool math symbols.
+
+def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
+    """
+    `img` is the output of the hough_lines(), An image with lines drawn on it.
+    Should be a blank image (all black) with lines drawn on it.
+
+    `initial_img` should be the image before any processing.
+
+    The result image is computed as follows:
+
+    initial_img * α + img * β + λ
+    NOTE: initial_img and img must be the same shape!
+    """
+    return cv2.addWeighted(initial_img, α, img, β, λ)
 
 
 image = mpimg.imread('test.jpg')
@@ -124,5 +141,5 @@ image = mpimg.imread('test.jpg')
 # plt.imshow(canny(image, 50, 150), cmap='Greys_r')
 # plt.show()
 # plt.imshow(region_of_interest(image, make_vertices(image)), cmap='Greys_r')
-plt.imshow(hough_lines(image))
+plt.imshow(weighted_img(hough_lines(image), image))
 plt.show()
