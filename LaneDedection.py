@@ -110,7 +110,8 @@ def hough_lines(img):
     min_line_length = 7  # minimum number of pixels making up a line
     max_line_gap = 3  # maximum gap in pixels between connectible line segments
     masked_image = region_of_interest(img, make_vertices(img))
-
+    http: // opencv - users
+    .1802565.n2.nabble.com / merge - lines - close - by - td5534403.html
     lines = cv2.HoughLinesP(masked_image, rho, theta, threshold, np.array([]), min_line_length,
                             max_line_gap)
     line_img = np.copy(image) * 0  # creating a blank to draw lines on
