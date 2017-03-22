@@ -73,7 +73,25 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
-def draw_lines(img, lines, color=[255, 0, 0], thickness=10):
+def extract_left_line(center_y, x1, y1, x2, y2):
+    if y1 < center_y:
+        return 0
+
+
+def extract_lines(center_x, center_y, x1, y1, x2, y2):
+    x_bottom_left1, x_bottom_left2, x_bottom_right1, x_bottom_right2 = 0
+    x_top_left1, x_top_left2, x_top_right1, x_top_right2 = 0
+    y_bottom_left1, y_bottom_left2, y_bottom_right1, y_bottom_right2 = 0
+    y_top_left1, y_top_left2, y_top_right1, y_top_right2 = 0
+
+    if x1 < center_x:
+        # Handle Left Lane
+        left_line = extract_left_line(center_y, x1, y1, x2, y2)
+
+    return x1, y1
+
+
+def draw_lines(img, lines, vertices, color=[255, 0, 0], thickness=10):
     """
     NOTE: this is the function you might want to use as a starting point once you want to
     average/extrapolate the line segments you detect to map out the full
@@ -91,9 +109,14 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=10):
     this function with the weighted_img() function below
     """
     # line_image = np.copy(img) * 0  # creating a blank to draw lines on
+    center_y = vertices.shape[0] / 2
+    center_x = vertices.shape[1] / 2
     for line in lines:
         for x1, y1, x2, y2 in line:
-            cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+            line_extract = extract_lines(center_x, center_y, x1, y1, x2, y2)
+            # cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+    cv2.rectangle(img, line_extract[0], line_extract[1], color, 2)
+    cv2.rectangle(img, line_extract[2], line_extract[3], color, 2)
 
 
 def hough_lines(img):
@@ -109,13 +132,13 @@ def hough_lines(img):
     threshold = 1  # minimum number of votes (intersections in Hough grid cell)
     min_line_length = 7  # minimum number of pixels making up a line
     max_line_gap = 3  # maximum gap in pixels between connectible line segments
-    masked_image = region_of_interest(img, make_vertices(img))
-    http: // opencv - users
-    .1802565.n2.nabble.com / merge - lines - close - by - td5534403.html
+    vertices = make_vertices(img)
+    masked_image = region_of_interest(img, vertices)
+
     lines = cv2.HoughLinesP(masked_image, rho, theta, threshold, np.array([]), min_line_length,
                             max_line_gap)
     line_img = np.copy(image) * 0  # creating a blank to draw lines on
-    draw_lines(line_img, lines)
+    draw_lines(line_img, lines, vertices)
     return line_img
 
 
