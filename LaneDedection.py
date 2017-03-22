@@ -75,10 +75,11 @@ def region_of_interest(img, vertices):
 
 def extract_left_line(center_y, x1, y1, x2, y2):
     if y1 < center_y:
+
         return 0
 
 
-def extract_lines(center_x, center_y, x1, y1, x2, y2):
+def extract_lines(line_extract, center_x, center_y, x1, y1, x2, y2):
     x_bottom_left1, x_bottom_left2, x_bottom_right1, x_bottom_right2 = 0
     x_top_left1, x_top_left2, x_top_right1, x_top_right2 = 0
     y_bottom_left1, y_bottom_left2, y_bottom_right1, y_bottom_right2 = 0
@@ -88,7 +89,7 @@ def extract_lines(center_x, center_y, x1, y1, x2, y2):
         # Handle Left Lane
         left_line = extract_left_line(center_y, x1, y1, x2, y2)
 
-    return x1, y1
+    return line_extract
 
 
 def draw_lines(img, lines, vertices, color=[255, 0, 0], thickness=10):
@@ -111,12 +112,13 @@ def draw_lines(img, lines, vertices, color=[255, 0, 0], thickness=10):
     # line_image = np.copy(img) * 0  # creating a blank to draw lines on
     center_y = vertices.shape[0] / 2
     center_x = vertices.shape[1] / 2
+    line_extract = None
     for line in lines:
         for x1, y1, x2, y2 in line:
-            line_extract = extract_lines(center_x, center_y, x1, y1, x2, y2)
+            line_extract = extract_lines(line_extract, center_x, center_y, x1, y1, x2, y2)
             # cv2.line(img, (x1, y1), (x2, y2), color, thickness)
     cv2.rectangle(img, line_extract[0], line_extract[1], color, 2)
-    cv2.rectangle(img, line_extract[2], line_extract[3], color, 2)
+    # cv2.rectangle(img, line_extract[2], line_extract[3], color, 2)
 
 
 def hough_lines(img):
